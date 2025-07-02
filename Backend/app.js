@@ -5,6 +5,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy as TwitterStrategy } from "passport-twitter";
 import cors from "cors";
+import helmet from "helmet";
 import authRoutes from "./routes/auth.js";
 import tweets from "./routes/tweets.js";
 import path from "path";
@@ -14,6 +15,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false
+}));
 
 // CORS configuration for production and development
 const corsOptions = {
@@ -39,27 +58,35 @@ app.use(
 );
 
 app.use(json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("💥 Server Error:", err.stack);
-  res.status(500).send("Something broke!");
+  res.status(500).json({ error: "Internal server error" });
 });
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Serve static files from React build in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../Frontend/dist')));
-}
+app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
 app.use("/auth", authRoutes);
 app.use("/tweets", tweets);
 
-// Catch all handler for React Router in production
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Frontend/dist', 'index.html'));
-  });
-}
+// Catch all handler for React Router - serve React app for all other routes
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Frontend/dist', 'index.html'));
+});
 
 passport.use(
   new TwitterStrategy(
