@@ -3,13 +3,16 @@ import passport from "passport";
 
 const router = Router();
 
+// Get the frontend URL from environment variables
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 router.get("/twitter", passport.authenticate("twitter"));
 
 router.get(
   "/twitter/callback",
   passport.authenticate("twitter", {
-    failureRedirect: "http://localhost:5173/",
-    successRedirect: "http://localhost:5173/dashboard",
+    failureRedirect: `${FRONTEND_URL}/`,
+    successRedirect: `${FRONTEND_URL}/dashboard`,
   })
 );
 
