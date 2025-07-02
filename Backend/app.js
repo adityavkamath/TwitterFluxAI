@@ -17,9 +17,7 @@ const app = express();
 
 // CORS configuration for production and development
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://your-app-name.onrender.com'
-    : "http://localhost:5173",
+  origin: process.env.FRONTEND_URL || 'https://twitter-uo1p.onrender.com',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
