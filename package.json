@@ -1,0 +1,21 @@
+{
+  "name": "twitter-ai-app",
+  "version": "1.0.0",
+  "description": "AI-powered Twitter content generator",
+  "scripts": {
+    "build": "cd Frontend && npm install && npm run build",
+    "start": "cd Backend && npm install && npm start",
+    "dev:backend": "cd Backend && npm run dev",
+    "dev:frontend": "cd Frontend && npm run dev",
+    "install:all": "cd Backend && npm install && cd ../Frontend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "your-repo-url"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
